@@ -27,6 +27,17 @@ result - no hand-written integration code, just the schema:
 
 ![Claude using the connector to query products and categories](docs/claude-connector-example.png)
 
+## Installation
+
+```bash
+composer require upturnstudio/module-mcp
+bin/magento module:enable UpturnStudio_Mcp
+bin/magento setup:upgrade
+bin/magento cache:flush
+```
+
+Running in production mode? Also run `bin/magento setup:di:compile` before `cache:flush`.
+
 ## Setup
 
 1. **Grant the permission.** A brand-new ACL resource, `UpturnStudio_Mcp::connector`
