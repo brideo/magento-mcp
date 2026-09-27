@@ -20,6 +20,9 @@ Two transports, same underlying tools and safety guarantees either way:
   `admin/upturnstudio_mcp/oauth/authorize`), for Claude.ai's hosted apps. Requires the site to
   be reachable over public HTTPS.
 
+For background and a walkthrough, see the blog post:
+[Magento MCP Claude Connector](https://upturnstudio.com.au/blog/magento-mcp-claude-connector).
+
 ## Example
 
 Claude calling `execute_graphql` against a live store, then narrowing the query based on the
