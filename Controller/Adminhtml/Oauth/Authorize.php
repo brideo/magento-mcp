@@ -15,6 +15,7 @@ use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\Data\Form\FormKey;
 use Magento\Framework\UrlInterface;
+use UpturnStudio\Mcp\Model\Config;
 use UpturnStudio\Mcp\Model\Oauth\HtmlPageRenderer;
 use UpturnStudio\Mcp\Model\Oauth\RedirectUriValidator;
 use UpturnStudio\Mcp\Model\ResourceModel\OauthClientStorage;
@@ -54,6 +55,7 @@ class Authorize extends Action
      * @param OauthClientStorage $clientStorage
      * @param RedirectUriValidator $redirectUriValidator
      * @param HtmlPageRenderer $htmlPageRenderer
+     * @param Config $config
      */
     public function __construct(
         Context $context,
@@ -62,7 +64,8 @@ class Authorize extends Action
         private readonly FormKey $formKey,
         private readonly OauthClientStorage $clientStorage,
         private readonly RedirectUriValidator $redirectUriValidator,
-        private readonly HtmlPageRenderer $htmlPageRenderer
+        private readonly HtmlPageRenderer $htmlPageRenderer,
+        private readonly Config $config
     ) {
         parent::__construct($context);
     }
@@ -85,6 +88,10 @@ class Authorize extends Action
      */
     public function execute(): ResultInterface
     {
+        if (!$this->config->isEnabled()) {
+            return $this->errorPage('The AI connector is disabled.');
+        }
+
         $clientId = (string) $this->getRequest()->getParam('client_id', '');
         $redirectUri = (string) $this->getRequest()->getParam('redirect_uri', '');
         $codeChallenge = (string) $this->getRequest()->getParam('code_challenge', '');

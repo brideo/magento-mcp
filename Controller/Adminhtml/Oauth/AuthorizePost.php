@@ -71,6 +71,10 @@ class AuthorizePost extends Action
      */
     public function execute(): ResultInterface
     {
+        if (!$this->config->isEnabled()) {
+            return $this->htmlResult($this->htmlPageRenderer->renderErrorPage('The AI connector is disabled.'));
+        }
+
         $clientId = (string) $this->getRequest()->getParam('client_id', '');
         $redirectUri = (string) $this->getRequest()->getParam('redirect_uri', '');
         $codeChallenge = (string) $this->getRequest()->getParam('code_challenge', '');

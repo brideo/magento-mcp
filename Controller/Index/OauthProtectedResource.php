@@ -39,6 +39,10 @@ class OauthProtectedResource implements HttpGetActionInterface
     {
         $result = $this->resultJsonFactory->create();
 
+        if (!$this->config->isEnabled()) {
+            return $result->setHttpResponseCode(404)->setData(['error' => 'not_found']);
+        }
+
         try {
             $result->setData([
                 'resource' => $this->config->getMcpEndpointUrl(),

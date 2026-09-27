@@ -42,6 +42,10 @@ class OauthAuthorizationServer implements HttpGetActionInterface
     {
         $result = $this->resultJsonFactory->create();
 
+        if (!$this->config->isEnabled()) {
+            return $result->setHttpResponseCode(404)->setData(['error' => 'not_found']);
+        }
+
         try {
             $issuer = $this->config->getPublicBaseUrl();
             $result->setData([

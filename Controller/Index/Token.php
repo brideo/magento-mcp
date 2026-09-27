@@ -14,6 +14,7 @@ use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\HTTP\PhpEnvironment\RemoteAddress;
 use Psr\Log\LoggerInterface;
+use UpturnStudio\Mcp\Model\Config;
 use UpturnStudio\Mcp\Model\Oauth\AuthorizationCodeIssuer;
 use UpturnStudio\Mcp\Model\Oauth\OauthGrantException;
 use UpturnStudio\Mcp\Model\Oauth\RedirectUriValidator;
@@ -40,6 +41,7 @@ class Token implements HttpPostActionInterface, CsrfAwareActionInterface
      * @param RedirectUriValidator $redirectUriValidator
      * @param Throttler $throttler
      * @param LoggerInterface $logger
+     * @param Config $config
      */
     public function __construct(
         private readonly RequestInterface $request,
@@ -49,7 +51,8 @@ class Token implements HttpPostActionInterface, CsrfAwareActionInterface
         private readonly TokenIssuer $tokenIssuer,
         private readonly RedirectUriValidator $redirectUriValidator,
         private readonly Throttler $throttler,
-        private readonly LoggerInterface $logger
+        private readonly LoggerInterface $logger,
+        private readonly Config $config
     ) {
     }
 
@@ -80,6 +83,10 @@ class Token implements HttpPostActionInterface, CsrfAwareActionInterface
         $result = $this->resultJsonFactory->create();
         $result->setHeader('Cache-Control', 'no-store', true);
         $result->setHeader('Pragma', 'no-cache', true);
+
+        if (!$this->config->isEnabled()) {
+            return $result->setHttpResponseCode(404)->setData(['error' => 'not_found']);
+        }
 
         $ip = (string) ($this->remoteAddress->getRemoteAddress() ?: 'unknown');
         $grantType = (string) $this->request->getParam('grant_type', '');

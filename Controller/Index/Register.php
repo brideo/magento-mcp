@@ -14,6 +14,7 @@ use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\HTTP\PhpEnvironment\RemoteAddress;
 use Psr\Log\LoggerInterface;
+use UpturnStudio\Mcp\Model\Config;
 use UpturnStudio\Mcp\Model\Oauth\ClientRegistrar;
 use UpturnStudio\Mcp\Model\Oauth\Throttler;
 
@@ -37,6 +38,7 @@ class Register implements HttpPostActionInterface, CsrfAwareActionInterface
      * @param ClientRegistrar $clientRegistrar
      * @param Throttler $throttler
      * @param LoggerInterface $logger
+     * @param Config $config
      */
     public function __construct(
         private readonly RequestInterface $request,
@@ -44,7 +46,8 @@ class Register implements HttpPostActionInterface, CsrfAwareActionInterface
         private readonly RemoteAddress $remoteAddress,
         private readonly ClientRegistrar $clientRegistrar,
         private readonly Throttler $throttler,
-        private readonly LoggerInterface $logger
+        private readonly LoggerInterface $logger,
+        private readonly Config $config
     ) {
     }
 
@@ -72,6 +75,11 @@ class Register implements HttpPostActionInterface, CsrfAwareActionInterface
     public function execute(): ResultInterface
     {
         $result = $this->resultJsonFactory->create();
+
+        if (!$this->config->isEnabled()) {
+            return $result->setHttpResponseCode(404)->setData(['error' => 'not_found']);
+        }
+
         $ip = (string) ($this->remoteAddress->getRemoteAddress() ?: 'unknown');
 
         if (!$this->throttler->isAllowed(self::THROTTLE_BUCKET, $ip)) {

@@ -71,6 +71,10 @@ class Index implements HttpPostActionInterface, CsrfAwareActionInterface
     {
         $result = $this->resultJsonFactory->create();
 
+        if (!$this->config->isEnabled()) {
+            return $result->setHttpResponseCode(404)->setData(['error' => 'not_found']);
+        }
+
         $authorizationHeader = $this->request->getHeader('Authorization');
         $tokenRow = $this->tokenAuthenticator->authenticate($authorizationHeader !== false ? $authorizationHeader : null);
         if ($tokenRow === null) {
