@@ -1,0 +1,87 @@
+<?xml version="1.0"?>
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+
+    <table name="upturnstudio_mcp_oauth_client" resource="default" engine="innodb" comment="MCP DCR OAuth Clients">
+        <column xsi:type="varchar" name="client_id" nullable="false" length="64" comment="Client ID"/>
+        <column xsi:type="varchar" name="client_name" nullable="true" length="255" comment="Client Name"/>
+        <column xsi:type="text" name="redirect_uris" nullable="false" comment="JSON array of registered redirect URIs"/>
+        <column xsi:type="varchar" name="token_endpoint_auth_method" nullable="false" length="32" default="none" comment="Always none - public client"/>
+        <column xsi:type="text" name="grant_types" nullable="false" comment="JSON array of granted grant types"/>
+        <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP" comment="Created At"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="client_id"/>
+        </constraint>
+    </table>
+
+    <table name="upturnstudio_mcp_authorization_code" resource="default" engine="innodb" comment="MCP OAuth Authorization Codes">
+        <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
+        <column xsi:type="varchar" name="code_hash" nullable="false" length="64" comment="SHA-256 hash of the opaque code"/>
+        <column xsi:type="varchar" name="client_id" nullable="false" length="64" comment="Client ID"/>
+        <column xsi:type="text" name="redirect_uri" nullable="false" comment="Redirect URI bound at /authorize"/>
+        <column xsi:type="varchar" name="code_challenge" nullable="false" length="128" comment="PKCE code_challenge"/>
+        <column xsi:type="varchar" name="code_challenge_method" nullable="false" length="16" default="S256" comment="PKCE method - always S256"/>
+        <column xsi:type="varchar" name="resource" nullable="true" length="255" comment="RFC 8707 resource indicator"/>
+        <column xsi:type="varchar" name="scope" nullable="true" length="255" comment="Granted scope"/>
+        <column xsi:type="int" name="admin_user_id" unsigned="true" nullable="false" comment="Admin User ID"/>
+        <column xsi:type="timestamp" name="expires_at" on_update="false" nullable="false" comment="Expires At"/>
+        <column xsi:type="timestamp" name="used_at" on_update="false" nullable="true" comment="Redeemed At - null until first redemption"/>
+        <column xsi:type="int" name="issued_token_entity_id" unsigned="true" nullable="true" comment="Access token row minted from this code, for replay revocation"/>
+        <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP" comment="Created At"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="UPTURNSTUDIO_MCP_AUTH_CODE_CODE_HASH">
+            <column name="code_hash"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="UPTURNSTUDIO_MCP_AUTH_CODE_CLIENT_ID_OAUTH_CLIENT_CLIENT_ID"
+                    table="upturnstudio_mcp_authorization_code" column="client_id"
+                    referenceTable="upturnstudio_mcp_oauth_client" referenceColumn="client_id" onDelete="CASCADE"/>
+        <constraint xsi:type="foreign" referenceId="UPTURNSTUDIO_MCP_AUTH_CODE_ADMIN_USER_ID_ADMIN_USER_USER_ID"
+                    table="upturnstudio_mcp_authorization_code" column="admin_user_id"
+                    referenceTable="admin_user" referenceColumn="user_id" onDelete="CASCADE"/>
+        <index referenceId="UPTURNSTUDIO_MCP_AUTH_CODE_EXPIRES_AT" indexType="btree">
+            <column name="expires_at"/>
+        </index>
+    </table>
+
+    <table name="upturnstudio_mcp_access_token" resource="default" engine="innodb" comment="MCP Opaque Access and Refresh Tokens">
+        <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
+        <column xsi:type="varchar" name="access_token_hash" nullable="false" length="64" comment="SHA-256 hash of the opaque access token"/>
+        <column xsi:type="varchar" name="refresh_token_hash" nullable="false" length="64" comment="SHA-256 hash of the opaque refresh token"/>
+        <column xsi:type="varchar" name="client_id" nullable="false" length="64" comment="Client ID"/>
+        <column xsi:type="int" name="admin_user_id" unsigned="true" nullable="false" comment="Admin User ID"/>
+        <column xsi:type="varchar" name="resource" nullable="true" length="255" comment="RFC 8707 resource indicator"/>
+        <column xsi:type="varchar" name="scope" nullable="true" length="255" comment="Granted scope"/>
+        <column xsi:type="varchar" name="family_id" nullable="false" length="64" comment="Groups a refresh token with every token descended from it via rotation"/>
+        <column xsi:type="varchar" name="status" nullable="false" length="16" default="active" comment="active, rotated, or revoked"/>
+        <column xsi:type="int" name="replaced_by_entity_id" unsigned="true" nullable="true" comment="Row this one rotated into, when status=rotated"/>
+        <column xsi:type="timestamp" name="access_token_expires_at" on_update="false" nullable="false" comment="Access Token Expires At"/>
+        <column xsi:type="timestamp" name="refresh_token_expires_at" on_update="false" nullable="false" comment="Refresh Token Expires At"/>
+        <column xsi:type="timestamp" name="revoked_at" on_update="false" nullable="true" comment="Revoked At"/>
+        <column xsi:type="timestamp" name="last_used_at" on_update="false" nullable="true" comment="Last successful /mcp call using this row"/>
+        <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP" comment="Created At"/>
+        <column xsi:type="timestamp" name="updated_at" on_update="true" nullable="false" default="CURRENT_TIMESTAMP" comment="Updated At"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="UPTURNSTUDIO_MCP_TOKEN_ACCESS_TOKEN_HASH">
+            <column name="access_token_hash"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="UPTURNSTUDIO_MCP_TOKEN_REFRESH_TOKEN_HASH">
+            <column name="refresh_token_hash"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="UPTURNSTUDIO_MCP_TOKEN_CLIENT_ID_OAUTH_CLIENT_CLIENT_ID"
+                    table="upturnstudio_mcp_access_token" column="client_id"
+                    referenceTable="upturnstudio_mcp_oauth_client" referenceColumn="client_id" onDelete="CASCADE"/>
+        <constraint xsi:type="foreign" referenceId="UPTURNSTUDIO_MCP_TOKEN_ADMIN_USER_ID_ADMIN_USER_USER_ID"
+                    table="upturnstudio_mcp_access_token" column="admin_user_id"
+                    referenceTable="admin_user" referenceColumn="user_id" onDelete="CASCADE"/>
+        <index referenceId="UPTURNSTUDIO_MCP_TOKEN_FAMILY_ID" indexType="btree">
+            <column name="family_id"/>
+        </index>
+        <index referenceId="UPTURNSTUDIO_MCP_TOKEN_REFRESH_TOKEN_EXPIRES_AT" indexType="btree">
+            <column name="refresh_token_expires_at"/>
+        </index>
+    </table>
+</schema>

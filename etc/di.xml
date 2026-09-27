@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Framework\Console\CommandList">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="upturnStudioMcpServe" xsi:type="object">UpturnStudio\Mcp\Console\Command\ServeCommand</item>
+                <item name="upturnStudioMcpInspector" xsi:type="object">UpturnStudio\Mcp\Console\Command\InspectorCommand</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <!--
+        The MCP tool registry: any module can contribute an additional Api\ToolInterface
+        implementation here from its own etc/di.xml, without touching UpturnStudio_Mcp -
+        these two are just this module's own tools, registered the same way any other
+        module's would be.
+    -->
+    <type name="UpturnStudio\Mcp\Model\Mcp\ToolRegistry">
+        <arguments>
+            <argument name="tools" xsi:type="array">
+                <item name="executeGraphql" xsi:type="object">UpturnStudio\Mcp\Model\Mcp\Tool\ExecuteGraphqlTool</item>
+                <item name="introspectGraphqlSchema" xsi:type="object">UpturnStudio\Mcp\Model\Mcp\Tool\IntrospectGraphqlSchemaTool</item>
+            </argument>
+        </arguments>
+    </type>
+</config>

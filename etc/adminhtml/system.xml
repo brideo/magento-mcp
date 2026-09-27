@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="upturnstudio_mcp" translate="label" type="text" sortOrder="500"
+                  showInDefault="1" showInWebsite="0" showInStore="0">
+            <label>AI Connector (MCP)</label>
+            <tab>advanced</tab>
+            <resource>UpturnStudio_Mcp::connector</resource>
+            <group id="general" translate="label" type="text" sortOrder="10"
+                   showInDefault="1" showInWebsite="0" showInStore="0">
+                <label>General</label>
+                <field id="enabled" translate="label" type="select" sortOrder="10"
+                       showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="public_base_url" translate="label comment" type="text" sortOrder="20"
+                       showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Public Base URL</label>
+                    <comment>The public https:// URL this store is reachable at (e.g. via a tunnel for a local
+                        site). Required before the connector can be used - it is the OAuth issuer and MCP
+                        resource identifier, and must never change once a client has registered against it.</comment>
+                </field>
+            </group>
+            <group id="token" translate="label" type="text" sortOrder="20"
+                   showInDefault="1" showInWebsite="0" showInStore="0">
+                <label>Token Lifetimes</label>
+                <field id="access_token_ttl" translate="label comment" type="text" sortOrder="10"
+                       showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Access Token Lifetime (seconds)</label>
+                    <comment>Default: 3600 (1 hour).</comment>
+                </field>
+                <field id="refresh_token_ttl" translate="label comment" type="text" sortOrder="20"
+                       showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Refresh Token Lifetime (seconds)</label>
+                    <comment>Default: 1209600 (14 days).</comment>
+                </field>
+                <field id="auth_code_ttl" translate="label comment" type="text" sortOrder="30"
+                       showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Authorization Code Lifetime (seconds)</label>
+                    <comment>Default: 60. Kept short deliberately - this is how long a one-time code is valid for
+                        before Claude exchanges it for tokens.</comment>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

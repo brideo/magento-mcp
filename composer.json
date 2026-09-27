@@ -1,0 +1,22 @@
+{
+    "name": "upturnstudio/module-mcp",
+    "description": "MCP (Model Context Protocol) connector exposing read-only Magento GraphQL access to Claude, authorized via OAuth 2.1 for Magento admin users.",
+    "type": "magento2-module",
+    "license": "MIT",
+    "authors": [
+        { "name": "UpturnStudio", "homepage": "https://upturnstudio.com.au/" }
+    ],
+    "require": {
+        "php": "~8.2.0||~8.3.0||~8.4.0||~8.5.0",
+        "magento/framework": "*",
+        "magento/module-backend": "*",
+        "magento/module-authorization": "*",
+        "magento/module-integration": "*",
+        "magento/module-user": "*",
+        "magento/module-graph-ql": "*"
+    },
+    "autoload": {
+        "files": ["registration.php"],
+        "psr-4": { "UpturnStudio\\Mcp\\": "" }
+    }
+}

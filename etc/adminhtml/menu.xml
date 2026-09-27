@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="UpturnStudio_Mcp::connected_apps" title="AI Connector (MCP)" module="UpturnStudio_Mcp"
+             sortOrder="200" parent="Magento_Backend::system" action="upturnstudio_mcp/connectedapps/index"
+             resource="UpturnStudio_Mcp::connector"/>
+    </menu>
+</config>

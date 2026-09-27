@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
+    <module name="UpturnStudio_Mcp">
+        <sequence>
+            <module name="Magento_Backend"/>
+            <module name="Magento_Authorization"/>
+            <module name="Magento_Integration"/>
+            <module name="Magento_User"/>
+            <module name="Magento_GraphQl"/>
+        </sequence>
+    </module>
+</config>
