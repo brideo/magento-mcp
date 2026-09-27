@@ -1,8 +1,15 @@
-# UpturnStudio_Mcp
+# Magento Connector MCP Module
 
-An MCP (Model Context Protocol) connector that lets Claude run **read-only GraphQL queries**
-against this Magento store, on behalf of an authenticated admin, using that admin's own
+**Magento Connector MCP Module** turns a Magento 2 / Adobe Commerce store into a
+[Model Context Protocol (MCP)](https://modelcontextprotocol.io) server, so Claude can run
+**read-only GraphQL queries** - products, categories, customers, orders, and anything else
+the store's schema exposes - on behalf of an authenticated admin, using that admin's own
 Magento permissions.
+
+It connects to Claude exactly like any other MCP integration: as a **normal custom
+connector** in Claude.ai / Claude Desktop (Settings > Connectors > Add - the same flow you'd
+use for any other service) over a standard OAuth 2.1 flow, or as a local MCP server for
+Claude Code. No special Claude-side support is needed either way.
 
 Two transports, same underlying tools and safety guarantees either way:
 
@@ -67,6 +74,7 @@ Requires Node.js/npx; this only launches the Inspector, it doesn't bundle it.
 
 ## Using it remotely (HTTP + OAuth)
 
+This works as a completely standard custom connector - no special setup on Claude's side.
 In Claude.ai: **Settings > Connectors > Add custom connector**, and paste the public base URL
 **with `/mcp` appended** - not the bare domain. For example, if the Public Base URL configured
 above is `https://your-domain.com`, enter:
