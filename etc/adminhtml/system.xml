@@ -43,6 +43,17 @@
                         before Claude exchanges it for tokens.</comment>
                 </field>
             </group>
+            <group id="core_web_vitals" translate="label" type="text" sortOrder="30"
+                   showInDefault="1" showInWebsite="0" showInStore="0">
+                <label>Core Web Vitals</label>
+                <field id="pagespeed_api_key" translate="label comment" type="obscure" sortOrder="10"
+                       showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>PageSpeed Insights API Key</label>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                    <comment>Optional. Used by the `check_core_web_vitals` tool. Leave blank to use the free,
+                        unauthenticated tier of the Google PageSpeed Insights API (lower rate limit).</comment>
+                </field>
+            </group>
         </section>
     </system>
 </config>

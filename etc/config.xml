@@ -12,6 +12,9 @@
                 <refresh_token_ttl>1209600</refresh_token_ttl>
                 <auth_code_ttl>60</auth_code_ttl>
             </token>
+            <core_web_vitals>
+                <pagespeed_api_key/>
+            </core_web_vitals>
         </upturnstudio_mcp>
     </default>
 </config>

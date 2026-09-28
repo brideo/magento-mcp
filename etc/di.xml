@@ -21,6 +21,7 @@
             <argument name="tools" xsi:type="array">
                 <item name="executeGraphql" xsi:type="object">UpturnStudio\Mcp\Model\Mcp\Tool\ExecuteGraphqlTool</item>
                 <item name="introspectGraphqlSchema" xsi:type="object">UpturnStudio\Mcp\Model\Mcp\Tool\IntrospectGraphqlSchemaTool</item>
+                <item name="checkCoreWebVitals" xsi:type="object">UpturnStudio\Mcp\Model\Mcp\Tool\CheckCoreWebVitalsTool</item>
             </argument>
         </arguments>
     </type>

@@ -53,6 +53,10 @@ Running in production mode? Also run `bin/magento setup:di:compile` before `cach
    issuer and MCP resource identifier, and must never change once a client has registered
    against it. Not needed for the stdio transport. See "Using it remotely" below for the
    actual URL to give Claude, which is this value *plus* `/mcp`.
+3. **(Optional) Set a PageSpeed Insights API key.** Stores > Configuration > Advanced >
+   AI Connector (MCP) > Core Web Vitals > PageSpeed Insights API Key. Only used by the
+   `check_core_web_vitals` tool - leave blank to use Google's free, unauthenticated tier
+   (lower rate limit).
 
 ## Using it locally (stdio)
 
@@ -125,10 +129,18 @@ live admin identity.
   permit.
 - **`introspect_graphql_schema`** - returns the full schema via standard introspection, so
   Claude can discover what's queryable without guessing.
+- **`check_core_web_vitals`** - given a store page URL, reports its Core Web Vitals (field
+  data plus a live Lighthouse run, via Google PageSpeed Insights) and resolves that URL to the
+  Magento entity behind it - product, category, or CMS page, including its entity ID - so a
+  follow-up `execute_graphql` query (or a human editing it directly) knows exactly which
+  record to target. Read-only, like everything else here: it identifies the entity, it
+  doesn't touch it.
 
-Both run through Magento's real `/graphql` endpoint internally (not in-process GraphQL
-classes) - the schema's own DI wiring is scattered across ~50 modules' `etc/graphql/di.xml`
-files and isn't safely reproducible from another area, so this reuses it as-is instead.
+`execute_graphql` and `introspect_graphql_schema` run through Magento's real `/graphql`
+endpoint internally (not in-process GraphQL classes) - the schema's own DI wiring is scattered
+across ~50 modules' `etc/graphql/di.xml` files and isn't safely reproducible from another
+area, so this reuses it as-is instead. `check_core_web_vitals` also uses this same `/graphql`
+endpoint (via the standard `route` query) to resolve the entity.
 
 ## Adding more tools
 

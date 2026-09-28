@@ -19,6 +19,7 @@ class Config
     private const XML_PATH_ACCESS_TOKEN_TTL = 'upturnstudio_mcp/token/access_token_ttl';
     private const XML_PATH_REFRESH_TOKEN_TTL = 'upturnstudio_mcp/token/refresh_token_ttl';
     private const XML_PATH_AUTH_CODE_TTL = 'upturnstudio_mcp/token/auth_code_ttl';
+    private const XML_PATH_PAGESPEED_API_KEY = 'upturnstudio_mcp/core_web_vitals/pagespeed_api_key';
 
     /**
      * @param ScopeConfigInterface $scopeConfig
@@ -90,5 +91,17 @@ class Config
     public function getAuthCodeTtl(): int
     {
         return (int) $this->scopeConfig->getValue(self::XML_PATH_AUTH_CODE_TTL);
+    }
+
+    /**
+     * Optional - the PageSpeed Insights API works unauthenticated at a lower rate limit, so
+     * null (not configured) is a normal, supported state, not an error.
+     *
+     * @return string|null
+     */
+    public function getPageSpeedApiKey(): ?string
+    {
+        $value = (string) $this->scopeConfig->getValue(self::XML_PATH_PAGESPEED_API_KEY);
+        return $value !== '' ? $value : null;
     }
 }
