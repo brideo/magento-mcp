@@ -7,6 +7,7 @@ declare(strict_types=1);
 namespace UpturnStudio\Mcp\Model;
 
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\Exception\LocalizedException;
 
 /**
@@ -23,9 +24,11 @@ class Config
 
     /**
      * @param ScopeConfigInterface $scopeConfig
+     * @param EncryptorInterface $encryptor
      */
     public function __construct(
-        private readonly ScopeConfigInterface $scopeConfig
+        private readonly ScopeConfigInterface $scopeConfig,
+        private readonly EncryptorInterface $encryptor
     ) {
     }
 
@@ -102,6 +105,10 @@ class Config
     public function getPageSpeedApiKey(): ?string
     {
         $value = (string) $this->scopeConfig->getValue(self::XML_PATH_PAGESPEED_API_KEY);
-        return $value !== '' ? $value : null;
+        if ($value === '') {
+            return null;
+        }
+        $decrypted = $this->encryptor->decrypt($value);
+        return $decrypted !== '' ? $decrypted : null;
     }
 }
