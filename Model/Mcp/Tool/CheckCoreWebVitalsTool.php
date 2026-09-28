@@ -8,41 +8,28 @@ namespace UpturnStudio\Mcp\Model\Mcp\Tool;
 
 use UpturnStudio\Mcp\Api\ToolExecutionException;
 use UpturnStudio\Mcp\Api\ToolInterface;
-use UpturnStudio\Mcp\Model\GraphQl\GraphQlExecutor;
 use UpturnStudio\Mcp\Model\PageSpeed\PageSpeedInsightsClient;
+use UpturnStudio\Mcp\Model\UrlRewrite\EntityResolver;
 
 /**
  * UpturnStudio_Mcp
  *
  * Reports Core Web Vitals for a store page and, separately, resolves that page's URL to a
- * Magento entity (product, category, or CMS page) via the real /graphql `route` query - so a
- * caller knows exactly which record a follow-up query or edit should target. Read-only, like
- * every other tool in this module: it identifies the entity, it does not modify it.
+ * Magento entity (product, category, or CMS page) - so a caller knows exactly which record a
+ * follow-up query or edit should target. Read-only, like every other tool in this module: it
+ * identifies the entity, it does not modify it.
  */
 class CheckCoreWebVitalsTool implements ToolInterface
 {
     private const NAME = 'check_core_web_vitals';
 
-    private const ROUTE_QUERY = <<<'GRAPHQL'
-        query($url: String!) {
-            route(url: $url) {
-                relative_url
-                redirect_code
-                type
-                ... on ProductInterface { id sku name }
-                ... on CategoryInterface { id uid name }
-                ... on CmsPage { identifier title }
-            }
-        }
-        GRAPHQL;
-
     /**
      * @param PageSpeedInsightsClient $pageSpeedInsightsClient
-     * @param GraphQlExecutor $graphQlExecutor
+     * @param EntityResolver $entityResolver
      */
     public function __construct(
         private readonly PageSpeedInsightsClient $pageSpeedInsightsClient,
-        private readonly GraphQlExecutor $graphQlExecutor
+        private readonly EntityResolver $entityResolver
     ) {
     }
 
@@ -96,40 +83,11 @@ class CheckCoreWebVitalsTool implements ToolInterface
             throw new ToolExecutionException('The "strategy" argument must be "mobile" or "desktop".');
         }
 
-        $coreWebVitals = $this->pageSpeedInsightsClient->analyze($url, $strategy);
-
         return [
             'url' => $url,
             'strategy' => $strategy,
-            'coreWebVitals' => $coreWebVitals,
-            'entity' => $this->resolveEntity($adminUserId, $url),
+            'coreWebVitals' => $this->pageSpeedInsightsClient->analyze($url, $strategy),
+            'entity' => $this->entityResolver->resolve($url),
         ];
-    }
-
-    /**
-     * Best-effort - a page with no matching url_rewrite (e.g. the homepage) is a normal
-     * result, not a failure, so this returns null rather than throwing.
-     *
-     * @param int $adminUserId
-     * @param string $url
-     * @return array|null
-     * @throws ToolExecutionException
-     */
-    private function resolveEntity(int $adminUserId, string $url): ?array
-    {
-        $path = ltrim((string) parse_url($url, PHP_URL_PATH), '/');
-        $result = $this->graphQlExecutor->execute($adminUserId, self::ROUTE_QUERY, ['url' => $path]);
-        $route = $result['data']['route'] ?? null;
-        $type = $route['type'] ?? null;
-
-        return match ($type) {
-            'PRODUCT' => ['type' => 'PRODUCT', 'id' => $route['id'] ?? null, 'sku' => $route['sku'] ?? null,
-                'name' => $route['name'] ?? null],
-            'CATEGORY' => ['type' => 'CATEGORY', 'id' => $route['id'] ?? null, 'uid' => $route['uid'] ?? null,
-                'name' => $route['name'] ?? null],
-            'CMS_PAGE' => ['type' => 'CMS_PAGE', 'identifier' => $route['identifier'] ?? null,
-                'title' => $route['title'] ?? null],
-            default => null,
-        };
     }
 }

@@ -13,7 +13,10 @@
         "magento/module-authorization": "*",
         "magento/module-integration": "*",
         "magento/module-user": "*",
-        "magento/module-graph-ql": "*"
+        "magento/module-graph-ql": "*",
+        "magento/module-url-rewrite": "*",
+        "magento/module-catalog": "*",
+        "magento/module-cms": "*"
     },
     "autoload": {
         "files": ["registration.php"],

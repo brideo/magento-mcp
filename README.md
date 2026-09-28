@@ -139,8 +139,10 @@ live admin identity.
 `execute_graphql` and `introspect_graphql_schema` run through Magento's real `/graphql`
 endpoint internally (not in-process GraphQL classes) - the schema's own DI wiring is scattered
 across ~50 modules' `etc/graphql/di.xml` files and isn't safely reproducible from another
-area, so this reuses it as-is instead. `check_core_web_vitals` also uses this same `/graphql`
-endpoint (via the standard `route` query) to resolve the entity.
+area, so this reuses it as-is instead. `check_core_web_vitals` doesn't need any of that: its
+entity lookup is a plain `url_rewrite` table lookup plus a repository fetch, both globally
+bound services with no area-scoping problem, so it resolves the entity in-process directly
+rather than paying for a loopback HTTP call to `/graphql`.
 
 ## Adding more tools
 
